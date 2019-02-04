@@ -1,0 +1,40 @@
+import ssl
+ssl._create_default_https_context=ssl._create_unverified_context#弱智MBP不知道为什么只要网站没安全证书，它就自己把自己干掉了。
+
+from urllib import request
+import re
+
+data=[]
+
+url = 'https://maoyan.com/board'
+rsp=request.urlopen(url)
+html = rsp.read().decode()
+
+
+s=r'<dd>(.*?)</dd>'
+pattern = re.compile(s,re.S)
+films = pattern.findall(html)
+
+# print(films)
+
+
+p=r'<p class="star">(.*?)</p>'
+m = r'<a.*?title="(.*?)"'
+s=r'<i class="fraction">([0-9])</i>'
+q=r'<i class="integer">(.*?)</i>'
+for film in films:
+    pattern = re.compile(m,re.S)
+    title = pattern.findall(film)[0].split()[0]#用split是因为爬取到的数据有换行符，写进txt的时候丑得...
+    pattern = re.compile(p,re.S)
+    star = pattern.findall(film)[0].split()[0]
+    pattern = re.compile(q,re.S)
+    integer = pattern.findall(film)[0].split()[0]
+    pattern = re.compile(s,re.S)
+    score = pattern.findall(film)[0].split()[0]
+    data.append('《'+title+'》'+' '+star+' '+integer+score)
+
+with open('当日热门电影.txt','w') as f:
+    for i in data:
+        f.writelines(i+'\n')
+
+f.close()
