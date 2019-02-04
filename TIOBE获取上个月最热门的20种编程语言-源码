@@ -1,0 +1,51 @@
+import ssl
+ssl._create_default_https_context=ssl._create_unverified_context
+from lxml import etree
+#import re#其实我还是喜欢用正则...
+import requests
+
+rank_list = []
+
+url = 'https://www.tiobe.com/tiobe-index/'
+rsp = requests.get(url)
+html = rsp.text
+
+html = etree.HTML(html,etree.HTMLParser())
+result = html.xpath('//table[contains(@class,''table-top20'')]/tbody/tr//text()')
+# for i in range(0,100,5):
+#     data = {
+#         '2019年上一月排名':result[i],
+#         '2018年上一月排名':result[i+1],
+#         '程序语言名称':result[i+2],
+#         '语言使用率':result[i+3],
+#         '较上月使用率比较':result[i+4]
+#     }
+#     rank_list.append(data)
+with open('编程语言当月排名.txt','w') as f:
+    for i in range(0,100,5):
+        f.writelines('2019年上一月排名：'+result[i]+'\n')
+        f.writelines('2018年上一月排名：'+result[i+1]+'\n')
+        f.writelines('程序语言名称：'+result[i+2]+'\n')
+        f.writelines('语言使用率：'+result[i+3]+'\n')
+        f.writelines('较上月使用率变化：'+result[i+4]+'\n')
+        f.writelines('\n')
+f.close()
+
+
+# s=r'<table class="table table-striped table-top20">(.*?)</table>'
+# pattern = re.compile(s,re.S)
+# table = pattern.findall(html)[0]
+
+# q=r'<td>(.*?)</td>'
+# pattern = re.compile(q,re.S)
+# list = pattern.findall(table)
+#
+# for i in range(0,120,6):
+#     data = {
+#         '2019年一月排名':list[i],
+#         '2018年一月排名':list[i+1],
+#         '程序语言名称':list[i+3],
+#         '语言使用率':list[i+4],
+#         '较上月使用率比较':list[i+5]
+#     }
+#     ranking.append(data)
