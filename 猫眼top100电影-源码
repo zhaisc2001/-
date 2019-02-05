@@ -1,0 +1,29 @@
+import ssl
+ssl._create_default_https_context=ssl._create_unverified_context
+
+import re,requests#我就算是用正则用到死，也不会碰lxml一分一毫！
+from lxml import etree#真香...
+baseurl = 'https://maoyan.com/board/4?offset='
+
+with open('猫眼电影top100.txt','w') as f:
+    for i in range(0,100,10):
+        rsp = requests.get(baseurl+str(i))
+        html = rsp.text
+        html = etree.HTML(html,etree.HTMLParser())
+        name = html.xpath('//p[@class="name"]/a/text()')
+        star = html.xpath('//p[@class="star"]/text()')
+        stars =[]
+        for k in star:
+            stars+=k.split()
+        time = html.xpath('//p[@class="releasetime"]/text()')
+        integer = html.xpath('//p[@class="score"]//text()')
+        score =[]
+        for n in range(0,20,2):
+            score.append(integer[n]+integer[n+1])
+        for j in range(10):
+            f.writelines(str(i+j+1)+'.'+name[j]+'\n')
+            f.writelines(stars[j] + '\n')
+            f.writelines(time[j] + '\n')
+            f.writelines('评分'+score[j] + '\n')
+            f.writelines('\n')
+f.close()
