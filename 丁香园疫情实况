@@ -1,0 +1,24 @@
+import ssl,re
+ssl._create_default_https_context=ssl._create_unverified_context
+
+from urllib import request
+
+url = 'https://ncov.dxy.cn/ncovh5/view/pneumonia'
+rsp = request.urlopen(url)
+html = rsp.read().decode()
+
+data_sichuan = re.findall(r'getAreaStat = (.+?)catch\(e\)',html)
+data_nation = re.findall(r'getStatisticsService = (.+?)catch\(e\)',html)
+data_sichuan = (eval(data_sichuan[0][:-1]))
+for i in data_sichuan:
+    if i['provinceName'] == '四川省':
+        data_1 = i
+data_sichuan = str(data_1)
+
+with open('/Users/violet/Documents/Spider教学/dxy-COVID19（四川）.txt','wb') as f:
+    f.write(data_sichuan.encode())
+    f.close()
+
+with open('/Users/violet/Documents/Spider教学/dxy-COVID19（国家）.txt','wb') as f:
+    f.write(str(data_nation).encode())
+    f.close()
